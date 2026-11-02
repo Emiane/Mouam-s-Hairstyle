@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "export": "next export",
-    "lint": "eslint"
+    "lint": "eslint",
+    "dev:vinext": "vite dev --port 3001",
+    "build:vinext": "vite build"
   },
   "dependencies": {
     "lucide-react": "^1.61.0",
@@ -21,9 +23,14 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@vitejs/plugin-rsc": "^0.5.38",
     "eslint": "^9",
     "eslint-config-next": "16.4.3",
+    "react-server-dom-webpack": "^19.3.1",
     "tailwindcss": "^4",
-    "typescript": "^5"
-  }
+    "typescript": "^5",
+    "vinext": "^0.0.7",
+    "vite": "^7.3.7"
+  },
+  "type": "module"
 }

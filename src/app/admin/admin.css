@@ -18,7 +18,6 @@
 .admin-service-image, .editor-image { aspect-ratio: 4 / 5; }
 .admin-service-image img, .editor-image img { object-fit: cover; }
 .admin-service-grid { align-items: start; grid-auto-flow: dense; }
-.admin-service-card:nth-child(2n) { transform: translateY(28px); }
 .admin-logo { background: var(--paper) url("/inspiration/logo.jpeg") center / cover; overflow: hidden; }
 .admin-logo svg { display: none; }
 .admin-stats button, .admin-panel, .admin-quick, .admin-service-card, .admin-info, .admin-editor { border-radius: 22px; }
@@ -47,8 +46,51 @@
 .admin-topbar { padding-top: 32px; }.admin-topbar .eyebrow { color: var(--espresso); font-weight: 800; }
 .admin-page-body, .admin-topbar, .admin-notice { animation: admin-rise .55s cubic-bezier(.22,1,.36,1) both; }
 .admin-nav button, .admin-card-actions button, .admin-stats button, .admin-quick button, .admin-service-card { transition: transform .25s ease, box-shadow .25s ease, background .25s ease; }
-.admin-nav button:hover, .admin-card-actions button:hover, .admin-stats button:hover, .admin-quick button:hover { transform: translateY(-3px); }.admin-service-card:hover { box-shadow: 0 20px 35px rgba(59,32,24,.13); transform: translateY(-5px); }.admin-service-card:nth-child(2n):hover { transform: translateY(23px); }
+.admin-nav button:hover, .admin-card-actions button:hover, .admin-stats button:hover, .admin-quick button:hover { transform: translateY(-3px); }.admin-service-card:hover { box-shadow: 0 20px 35px rgba(59,32,24,.13); transform: translateY(-5px); }
 @keyframes admin-rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes admin-login-in { from { opacity: 0; transform: translateY(22px) scale(.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
 @keyframes admin-mark-in { from { opacity: 0; transform: rotate(-12deg) scale(.7); } to { opacity: 1; transform: rotate(0) scale(1); } }
 @media (max-width: 640px) { .admin-shell { padding: 12px; }.admin-sidebar { border-radius: 18px; min-height: auto; width: 100%; }.admin-brand > span:last-child { display: inline; }.admin-nav button { font-size: 11px; justify-content: flex-start; width: auto; }.admin-sidebar-bottom { display: none; }.admin-content { width: 100%; } }
+
+.admin-editor-backdrop { overflow-y: auto; }
+.admin-editor { max-height: min(92vh, 760px); }
+.editor-image { aspect-ratio: 16 / 6; height: auto; min-height: 120px; }
+.editor-image label.uploading { cursor: wait; opacity: .7; }
+.admin-editor button:disabled { cursor: wait; opacity: .65; }
+.admin-service-grid { align-items: stretch; grid-auto-flow: row; }
+.admin-service-card { align-self: stretch; display: flex; flex-direction: column; min-width: 0; transform: none !important; }
+.admin-service-image { flex: 0 0 auto; height: auto; min-height: 0; aspect-ratio: 4 / 5; }
+.admin-service-info { flex: 1; }
+.admin-service-card:hover { transform: none !important; }
+@media (max-height: 700px) { .admin-editor { padding: 24px; }.editor-image { margin: 12px 0; min-height: 90px; }.admin-editor label { margin-top: 10px; } }
+.admin-editor select { background: transparent; border: 1px solid var(--line); border-radius: 9px; color: var(--ink); outline: 0; padding: 12px; width: 100%; }
+.editor-image img { background: var(--cream); object-fit: contain !important; }
+
+.admin-nav button, .admin-sidebar-bottom a, .admin-sidebar-bottom button { transition: background .25s ease, color .25s ease, transform .25s ease; }
+.admin-nav button:hover, .admin-sidebar-bottom a:hover, .admin-sidebar-bottom button:hover { transform: translateX(4px); }
+.admin-service-card { animation: admin-card-in .65s cubic-bezier(.22, 1, .36, 1) both; position: relative; transition: box-shadow .35s ease, transform .35s cubic-bezier(.22, 1, .36, 1); will-change: transform; }
+.admin-service-card:nth-child(2) { animation-delay: .08s; }
+.admin-service-card:nth-child(3) { animation-delay: .16s; }
+.admin-service-card:nth-child(4) { animation-delay: .24s; }
+.admin-service-card:nth-child(5) { animation-delay: .32s; }
+.admin-service-card:nth-child(6) { animation-delay: .4s; }
+.admin-service-card:nth-child(2n) .admin-service-image { aspect-ratio: 4 / 4.7; }
+.admin-service-card:nth-child(3n) .admin-service-image { aspect-ratio: 4 / 5.3; }
+.admin-service-card:hover { box-shadow: 0 22px 42px rgba(59, 32, 24, .18); transform: translateY(-9px) rotate(.35deg) !important; z-index: 2; }
+.admin-service-card:hover .admin-service-image img { transform: scale(1.06); }
+.admin-service-image img { transition: transform .6s cubic-bezier(.22, 1, .36, 1), filter .6s ease; }
+.admin-service-card:hover .admin-service-image img { filter: saturate(1.08); }
+.admin-stats button, .admin-panel { animation: admin-panel-in .6s cubic-bezier(.22, 1, .36, 1) both; }
+.admin-stats button:nth-child(2) { animation-delay: .08s; }
+.admin-stats button:nth-child(3) { animation-delay: .16s; }
+.admin-editor-backdrop { animation: admin-backdrop-in .25s ease both; }
+.admin-editor { animation: admin-editor-in .45s cubic-bezier(.22, 1, .36, 1) both; }
+.editor-image-placeholder { align-items: center; color: #9c8175; display: flex; flex-direction: column; gap: 7px; inset: 0; justify-content: center; position: absolute; text-align: center; }
+.editor-image-placeholder span { font-size: 11px; }
+.editor-image-placeholder small { font-size: 9px; opacity: .7; }
+@keyframes admin-card-in { from { opacity: 0; transform: translateY(18px) scale(.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes admin-panel-in { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes admin-backdrop-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes admin-editor-in { from { opacity: 0; transform: translateY(18px) scale(.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@media (prefers-reduced-motion: reduce) { .admin-service-card, .admin-stats button, .admin-panel, .admin-editor-backdrop, .admin-editor { animation: none; } }
+@media (max-width: 640px) { .admin-service-card:nth-child(2n) .admin-service-image, .admin-service-card:nth-child(3n) .admin-service-image { aspect-ratio: 4 / 5; } .admin-service-card:hover { transform: translateY(-5px) !important; } }
