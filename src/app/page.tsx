@@ -10,6 +10,7 @@ import { useEffect, useState, type CSSProperties } from "react";
 // ==========================================
 
 type Service = {
+  id?: string;
   name: string;
   category: string;
   description: string;
@@ -20,19 +21,83 @@ type Service = {
   active?: boolean;
 };
 
+type Review = {
+  id?: number | string;
+  name: string;
+  service: string;
+  text: string;
+  rating?: number;
+  category?: string;
+};
+
 const SERVICES: Service[] = [
-  { name: "Knotless braids", category: "Knotless", description: "Des tresses légères et protectrices, personnalisées selon votre style.", price: 85, image: "/inspiration/image.jpeg", size: "Moyenne", length: "Épaules" },
-  { name: "Boho braids", category: "Braids", description: "Un mélange de tresses et de boucles pour une finition souple et aérienne.", price: 120, image: "/inspiration/idee2.jpeg", size: "Fine", length: "Mi-dos" },
-  { name: "Fulani braids", category: "Tresses", description: "Une coiffure graphique et élégante avec des détails qui attirent le regard.", price: 95, image: "/inspiration/prestation-detail.jpeg", size: "Moyenne", length: "Longues" },
-  { name: "Tresses signature", category: "Tresses", description: "Une création sur mesure, pensée avec vous pour vous ressembler.", price: 75, image: "/inspiration/bg2.jpeg", size: "Large", length: "Mi-dos" },
+  {
+    id: "knotless",
+    name: "Knotless braids",
+    category: "Knotless",
+    description: "Des tresses légères et protectrices, personnalisées selon votre style.",
+    price: 85,
+    image: "/inspiration/image.jpeg",
+    size: "Moyenne",
+    length: "Épaules",
+    active: true,
+  },
+  {
+    id: "boho",
+    name: "Boho braids",
+    category: "Braids",
+    description: "Un mélange de tresses et de boucles pour une finition souple et aérienne.",
+    price: 120,
+    image: "/inspiration/idee2.jpeg",
+    size: "Fine",
+    length: "Mi-dos",
+    active: true,
+  },
+  {
+    id: "fulani",
+    name: "Fulani braids",
+    category: "Tresses",
+    description: "Une coiffure graphique et élégante avec des détails qui attirent le regard.",
+    price: 95,
+    image: "/inspiration/prestation-detail.jpeg",
+    size: "Moyenne",
+    length: "Longues",
+    active: true,
+  },
+  {
+    id: "signature",
+    name: "Tresses signature",
+    category: "Tresses",
+    description: "Une création sur mesure, pensée avec vous pour vous ressembler.",
+    price: 75,
+    image: "/inspiration/bg2.jpeg",
+    size: "Large",
+    length: "Mi-dos",
+    active: true,
+  },
 ];
 
 const TIME_SLOTS = ["08:00", "10:30", "13:00", "15:30", "18:00"];
 
-const INITIAL_REVIEWS = [
-  { name: "Aïcha", service: "Knotless braids", text: "Un moment doux, une coiffure magnifique et beaucoup de soin dans chaque détail." },
-  { name: "Mélissa", service: "Boho braids", text: "Mouam's a parfaitement compris ce que je voulais. Je suis repartie ravie." },
-  { name: "Sarah", service: "Fulani braids", text: "Une vraie parenthèse beauté. Les tresses sont encore plus belles que dans mon inspiration." },
+const INITIAL_REVIEWS: Review[] = [
+  {
+    id: 1,
+    name: "Aïcha",
+    service: "Knotless braids",
+    text: "Un moment doux, une coiffure magnifique et beaucoup de soin dans chaque détail.",
+  },
+  {
+    id: 2,
+    name: "Mélissa",
+    service: "Boho braids",
+    text: "Mouam's a parfaitement compris ce que je voulais. Je suis repartie ravie.",
+  },
+  {
+    id: 3,
+    name: "Sarah",
+    service: "Fulani braids",
+    text: "Une vraie parenthèse beauté. Les tresses sont encore plus belles que dans mon inspiration.",
+  },
 ];
 
 const COUNTRY_CODES = [
@@ -67,11 +132,11 @@ function isSchoolHoliday(date: string) {
 
 function WeekendCalendar({ value, onChange }: { value: string; onChange: (value: string) => void }) {
   const [month, setMonth] = useState(() => (value ? new Date(`${value}T12:00:00`) : new Date(2026, 9, 1)));
-  
+
   const firstDay = new Date(month.getFullYear(), month.getMonth(), 1).getDay();
   const daysInMonth = new Date(month.getFullYear(), month.getMonth() + 1, 0).getDate();
   const monthLabel = month.toLocaleDateString("fr-FR", { month: "long", year: "numeric" });
-  
+
   const isBeforeMinimumMonth =
     (month.getFullYear() === MINIMUM_BOOKING_MONTH.getFullYear() && month.getMonth() <= MINIMUM_BOOKING_MONTH.getMonth()) ||
     month < MINIMUM_BOOKING_MONTH;
@@ -152,7 +217,7 @@ export default function Home() {
   const [filter, setFilter] = useState("Tout voir");
   const [activeService, setActiveService] = useState(0);
   const [selectedStyle, setSelectedStyle] = useState<Service | null>(null);
-  
+
   // États de réservation
   const [bookingOpen, setBookingOpen] = useState(false);
   const [selectedSlot, setSelectedSlot] = useState("");
@@ -161,7 +226,7 @@ export default function Home() {
   const [customerName, setCustomerName] = useState("");
   const [customerWhatsapp, setCustomerWhatsapp] = useState("");
   const [countryCode, setCountryCode] = useState("+32");
-  const [bookingStyle, setBookingStyle] = useState(SERVICES[0]);
+  const [bookingStyle, setBookingStyle] = useState<Service>(SERVICES[0]);
   const [withHair, setWithHair] = useState(true);
 
   // États des avis
@@ -170,15 +235,7 @@ export default function Home() {
   const [reviewComment, setReviewComment] = useState("");
   const [reviewRating, setReviewRating] = useState(0);
   const [reviewCategory, setReviewCategory] = useState(SERVICES[0].category);
-  const [displayedReviews, setDisplayedReviews] = useState(() => {
-    if (typeof window === "undefined") return INITIAL_REVIEWS;
-    try {
-      const savedReviews = JSON.parse(localStorage.getItem("mouams-reviews") ?? "[]");
-      return Array.isArray(savedReviews) ? [...INITIAL_REVIEWS, ...savedReviews] : INITIAL_REVIEWS;
-    } catch {
-      return INITIAL_REVIEWS;
-    }
-  });
+  const [displayedReviews, setDisplayedReviews] = useState<Review[]>(INITIAL_REVIEWS);
   const [activeReview, setActiveReview] = useState(0);
 
   // UI & Navigation
@@ -193,26 +250,31 @@ export default function Home() {
   const visibleStyles = filter === "Tout voir" ? siteServices : siteServices.filter((s) => s.category === filter);
   const displayedStyles = showAllGallery ? visibleStyles : visibleStyles.slice(0, 6);
   const currentService = siteServices[activeService] ?? siteServices[0];
-  const bookingPrice = bookingStyle.price;
+  const bookingPrice = bookingStyle ? bookingStyle.price : 0;
   const isBookingComplete = customerName.trim() !== "" && customerWhatsapp.trim() !== "" && selectedDate !== "" && selectedSlot !== "";
 
-  // Synchronisation avec le localStorage
+  // Synchronisation avec le localStorage au montage du client
   useEffect(() => {
     function syncLocalStorageData() {
       try {
         const savedServices = JSON.parse(localStorage.getItem("mouams-services") ?? "null");
         if (Array.isArray(savedServices) && savedServices.length > 0) {
-          const activeServices = savedServices.filter((s: Service) => s.active);
+          const activeServices = savedServices.filter((s: Service) => s.active !== false);
           setSiteServices(activeServices);
           setFilters(["Tout voir", ...Array.from(new Set(activeServices.map((s: Service) => s.category)))]);
         }
 
         setBlockedSlots(JSON.parse(localStorage.getItem("mouams-blocked-slots") ?? "[]"));
-        
+
         const savedSlots = JSON.parse(localStorage.getItem("mouams-time-slots") ?? "null");
         if (Array.isArray(savedSlots)) setSiteSlots(savedSlots);
+
+        const savedReviews = JSON.parse(localStorage.getItem("mouams-reviews") ?? "[]");
+        if (Array.isArray(savedReviews) && savedReviews.length > 0) {
+          setDisplayedReviews([...INITIAL_REVIEWS, ...savedReviews]);
+        }
       } catch {
-        // Fallback en cas d'erreur
+        // Fallback discret en cas d'erreur
       }
     }
 
@@ -252,7 +314,7 @@ export default function Home() {
     const current = JSON.parse(localStorage.getItem("mouams-appointments") ?? "[]");
     localStorage.setItem("mouams-appointments", JSON.stringify([...current, appointment]));
     window.dispatchEvent(new Event("storage"));
-    
+
     // Reset
     setCustomerName("");
     setCustomerWhatsapp("");
@@ -264,7 +326,7 @@ export default function Home() {
 
   function submitReview() {
     if (!reviewName.trim() || !reviewComment.trim() || reviewRating === 0) return;
-    const review = {
+    const review: Review = {
       id: Date.now(),
       name: reviewName.trim(),
       text: reviewComment.trim(),
@@ -275,7 +337,7 @@ export default function Home() {
     const current = JSON.parse(localStorage.getItem("mouams-reviews") ?? "[]");
     localStorage.setItem("mouams-reviews", JSON.stringify([...current, review]));
     setDisplayedReviews((items) => [...items, review]);
-    
+
     // Reset
     setReviewName("");
     setReviewComment("");
@@ -311,14 +373,19 @@ export default function Home() {
       <header className="nav-wrap">
         <a href="#accueil" className="brand">
           <Image src="/inspiration/logo.jpeg" alt="Mouam's Hairstyle" width={72} height={72} priority />
-          <span className="brand-name">Mouam&apos;s<br /><em>Hairstyle</em></span>
+          <span className="brand-name">
+            Mouam&apos;s<br />
+            <em>Hairstyle</em>
+          </span>
         </a>
         <nav className={`main-nav ${mobileMenuOpen ? "mobile-open" : ""}`}>
           <a href="#galerie" onClick={() => setMobileMenuOpen(false)}>Galerie</a>
           <a href="#prestations" onClick={() => setMobileMenuOpen(false)}>Prestations</a>
           <a href="#apropos" onClick={() => setMobileMenuOpen(false)}>À propos</a>
           <a href="#faq" onClick={() => setMobileMenuOpen(false)}>FAQ</a>
-          <a className="mobile-booking" href="#reservation" onClick={() => setMobileMenuOpen(false)}>Prendre rendez-vous <span>↗</span></a>
+          <a className="mobile-booking" href="#reservation" onClick={() => setMobileMenuOpen(false)}>
+            Prendre rendez-vous <span>↗</span>
+          </a>
         </nav>
         <button className="menu-toggle" onClick={() => setMobileMenuOpen(!mobileMenuOpen)} aria-label="Menu">
           {mobileMenuOpen ? <X size={21} strokeWidth={1.5} /> : <Menu size={21} strokeWidth={1.5} />}
@@ -385,33 +452,35 @@ export default function Home() {
             </div>
             <p>Faites défiler les créations<br />et trouvez votre prochaine coiffure.</p>
           </div>
-          <div className="service-showcase" key={currentService.name}>
-            <div className="service-preview">
-              <Image src={currentService.image} alt={currentService.name} fill sizes="(max-width: 700px) 100vw, 48vw" />
-              <span className="service-index">0{activeService + 1} / 0{siteServices.length}</span>
-            </div>
-            <div className="service-details">
-              <p className="eyebrow light">{currentService.category}</p>
-              <h3>{currentService.name}</h3>
-              <p>{currentService.description}</p>
-              <div className="service-price">dès <strong>{currentService.price} €</strong><small>avec mèches</small></div>
-              <div className="feature-tags">
-                <span>Taille {currentService.size}</span>
-                <span>Longueur {currentService.length}</span>
-                <span>Mèches incluses</span>
+          {currentService && (
+            <div className="service-showcase" key={currentService.name}>
+              <div className="service-preview">
+                <Image src={currentService.image} alt={currentService.name} fill sizes="(max-width: 700px) 100vw, 48vw" />
+                <span className="service-index">0{activeService + 1} / 0{siteServices.length}</span>
               </div>
-              <button className="button button-dark full" onClick={() => openBooking(currentService)}>Choisir cette coiffure <span>↗</span></button>
-              <div className="service-controls">
-                <button onClick={() => setActiveService((activeService - 1 + siteServices.length) % siteServices.length)} aria-label="Prestation précédente">←</button>
-                <div>
-                  {siteServices.map((service, index) => (
-                    <button key={service.name} className={activeService === index ? "active" : ""} onClick={() => setActiveService(index)} aria-label={`Voir ${service.name}`} />
-                  ))}
+              <div className="service-details">
+                <p className="eyebrow light">{currentService.category}</p>
+                <h3>{currentService.name}</h3>
+                <p>{currentService.description}</p>
+                <div className="service-price">dès <strong>{currentService.price} €</strong><small>avec mèches</small></div>
+                <div className="feature-tags">
+                  <span>Taille {currentService.size}</span>
+                  <span>Longueur {currentService.length}</span>
+                  <span>Mèches incluses</span>
                 </div>
-                <button onClick={() => setActiveService((activeService + 1) % siteServices.length)} aria-label="Prestation suivante">→</button>
+                <button className="button button-dark full" onClick={() => openBooking(currentService)}>Choisir cette coiffure <span>↗</span></button>
+                <div className="service-controls">
+                  <button onClick={() => setActiveService((activeService - 1 + siteServices.length) % siteServices.length)} aria-label="Prestation précédente">←</button>
+                  <div>
+                    {siteServices.map((service, index) => (
+                      <button key={service.name} className={activeService === index ? "active" : ""} onClick={() => setActiveService(index)} aria-label={`Voir ${service.name}`} />
+                    ))}
+                  </div>
+                  <button onClick={() => setActiveService((activeService + 1) % siteServices.length)} aria-label="Prestation suivante">→</button>
+                </div>
               </div>
             </div>
-          </div>
+          )}
           <p className="hair-note"><b>Bon à savoir</b> — Vous pouvez fournir vos propres mèches. Elles devront être déposées au moins <b>2 jours avant</b> la prestation. L’acompte de 20 € est obligatoire et déduit du solde.</p>
         </section>
 
@@ -437,10 +506,10 @@ export default function Home() {
           </div>
           <div className="booking-card">
             <div className="booking-top"><span>Étape 01 / 02</span><strong>Votre réservation</strong></div>
-            
+
             <label htmlFor="customer-name">Votre nom</label>
             <input id="customer-name" value={customerName} onChange={(e) => setCustomerName(e.target.value)} placeholder="Prénom et nom" required />
-            
+
             <label htmlFor="customer-whatsapp">Votre WhatsApp</label>
             <div className="whatsapp-field">
               <select value={countryCode} onChange={(e) => setCountryCode(e.target.value)} aria-label="Indicatif du pays">
@@ -495,7 +564,7 @@ export default function Home() {
             <h2>Tout est<br /><i>clair.</i></h2>
             <p className="review-intro">Une question ou une expérience à partager ? Laissez un message, Mouam&apos;s pourra vous répondre.</p>
           </div>
-            
+
           <div className="faq-list">
             <details open>
               <summary>Où se déroule la prestation ? <span>+</span></summary>
@@ -507,21 +576,23 @@ export default function Home() {
             </details>
             <details>
               <summary>Comment fonctionne l&apos;acompte ? <span>+</span></summary>
-              <p>Un acompte fixe de 20 € est demandé pour confirmer chaque réservation. Il est conservé en cas d&apos;annulation tardive.</p>
+              <p>Un acompte fixe de 20 € est demandé pour confirmer chaque réservation. Il me permet de réserver votre créneau.</p>
             </details>
 
             {/* AVIS */}
-            <div className="review-carousel">
-              <div className="review-stars" aria-label="5 étoiles">★ ★ ★ ★ ★</div>
-              <blockquote key={activeReview}>{displayedReviews[activeReview].text}</blockquote>
-              <strong>{displayedReviews[activeReview].name}</strong>
-              <small>{displayedReviews[activeReview].service}</small>
-              <div className="review-controls">
-                <button onClick={() => setActiveReview((activeReview - 1 + displayedReviews.length) % displayedReviews.length)} aria-label="Avis précédent">←</button>
-                <span>{activeReview + 1} / {displayedReviews.length}</span>
-                <button onClick={() => setActiveReview((activeReview + 1) % displayedReviews.length)} aria-label="Avis suivant">→</button>
+            {displayedReviews.length > 0 && (
+              <div className="review-carousel">
+                <div className="review-stars" aria-label="5 étoiles">★ ★ ★ ★ ★</div>
+                <blockquote key={activeReview}>{displayedReviews[activeReview]?.text}</blockquote>
+                <strong>{displayedReviews[activeReview]?.name}</strong>
+                <small>{displayedReviews[activeReview]?.service}</small>
+                <div className="review-controls">
+                  <button onClick={() => setActiveReview((activeReview - 1 + displayedReviews.length) % displayedReviews.length)} aria-label="Avis précédent">←</button>
+                  <span>{activeReview + 1} / {displayedReviews.length}</span>
+                  <button onClick={() => setActiveReview((activeReview + 1) % displayedReviews.length)} aria-label="Avis suivant">→</button>
+                </div>
               </div>
-            </div>
+            )}
 
             {/* FORMULAIRE AVIS */}
             <div className="review-form">
@@ -591,10 +662,10 @@ export default function Home() {
             <button className="modal-close" onClick={() => setBookingOpen(false)}>×</button>
             <p className="eyebrow">Demande de rendez-vous</p>
             <h2>On réserve votre<br /><i>moment beauté.</i></h2>
-            
+
             <label htmlFor="modal-customer-name">Votre nom</label>
             <input id="modal-customer-name" value={customerName} onChange={(e) => setCustomerName(e.target.value)} placeholder="Prénom et nom" required />
-            
+
             <label htmlFor="modal-customer-whatsapp">Votre WhatsApp</label>
             <div className="whatsapp-field">
               <select value={countryCode} onChange={(e) => setCountryCode(e.target.value)} aria-label="Indicatif du pays">
